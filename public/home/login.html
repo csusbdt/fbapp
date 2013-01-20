@@ -1,0 +1,10 @@
+<button id="login-btn">Login</button>
+<script>
+  $('#login-btn').click(function() {
+    app.c.login(function(errMsg) {
+      if (errMsg) alert(errMsg);
+      else app.v.transitionTo('title');
+    });
+  });
+</script>
+

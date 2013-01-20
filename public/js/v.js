@@ -5,7 +5,7 @@ $(function() {
   var currentScreen,
       screens = {};
 
-  app.v.transitionTo = function(screenName) {
+  var transitionTo = app.v.transitionTo = function(screenName) {
     var $oldScreenDiv, 
         $newScreenDiv;
     currentScreen = screens[screenName];
@@ -25,20 +25,19 @@ $(function() {
   // login screen
   screens.login = {};
   screens.login.build = function($screenDiv) {
-    var $btn = $('<button id="login">Login</button>');
-    $btn.click(function() {
-      app.c.login(function(errMsg) {
-        if (errMsg) alert(errMsg);
-        else app.v.transitionTo('title');
-      });
-    });
-    $screenDiv.append($btn);
+    $screenDiv.load('home/login.html' +'?'+Math.random());
   };
 
   // title screen
   screens.title = {};
   screens.title.build = function($screenDiv) {
-    $screenDiv.append('You are logged into the app.');
+    $screenDiv.load('home/title.html' +'?'+Math.random());
+  };
+
+  // number screen
+  screens.number = {};
+  screens.number.build = function($screenDiv) {
+    $screenDiv.load('home/number.html' +'?'+Math.random());
   };
 
   fbAsyncInit();
