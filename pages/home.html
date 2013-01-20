@@ -1,0 +1,46 @@
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>App</title>
+  </head>
+  <body>
+    <div id="fb-root"></div>
+
+    <div id="screenContainer">
+      <div class="screen">Loading ...</div>
+    </div>
+
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+    <script>
+      (function() {
+        var pendingReturns = 4;
+
+        window.fbAsyncInit = function() {
+          if (--pendingReturns === 0) {
+            app.c.init('FACEBOOK_APP_ID');
+          }
+        };
+      }());
+
+      (function(d) {
+        var ref = d.getElementsByTagName('script')[0],
+            fbJs = d.createElement('script'),
+            cJs = d.createElement('script'),
+            mJs = d.createElement('script'),
+            vJs = d.createElement('script');
+        fbJs.id = 'facebook-jssdk'; 
+        fbJs.async = true;
+        fbJs.src = "//connect.facebook.net/en_US/all.js";
+        cJs.src = "js/c.js?" + Math.random();
+        mJs.src = "js/m.js?" + Math.random();
+        vJs.src = "js/v.js?" + Math.random();
+        ref.parentNode.insertBefore(fbJs, ref);
+        ref.parentNode.insertBefore(cJs, ref);
+        ref.parentNode.insertBefore(mJs, ref);
+        ref.parentNode.insertBefore(vJs, ref);
+      }(document));
+    </script>
+
+  </body>
+</html>
+
