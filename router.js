@@ -10,7 +10,7 @@ function route(req, res) {
   var pathname = url.parse(req.url).pathname;
   if      (pathname === '/')             req_home.redirectHome (req, res);
   else if (pathname === '/home')         req_home.handle       (req, res);
-//  else if (pathname === '/save')         req_save.handle       (req, res);
+  else if (pathname === '/save')         req_save.handle       (req, res);
   else if (pathname === '/mem')          req_mem.handle        (req, res);
   else                                   req_memfile.handle    (req, res);
 }

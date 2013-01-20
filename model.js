@@ -71,19 +71,20 @@ exports.saveSecret = function(user, cb) {
 };
 
 // Input: user.uid
-// Reads: user.gameState
-exports.getGameState = function(user, cb) {
+// Reads: user.appState
+exports.getAppState = function(user, cb) {
   mongo.Db.connect(process.env.MONGO_URI, function (err, db) {
     if (err) return cb(err);
     db.collection('users').findOne(
       { _id: user.uid }, 
-      { gameState: 1, _id: 0 }, 
+      { appState: 1, _id: 0 }, 
       function(err, dbUser) {
         if (err) return cb(err);
-        if (dbUser.gameState) {
-          user.gameState = dbUser.gameState;
+        if (dbUser.appState) {
+          user.appState = dbUser.appState;
         } else {
-          user.gameState = { number: 0 }
+          // if app state missing, then use implicit app state
+          user.appState = { number: 0 }
         }
         cb();
       }
@@ -91,14 +92,14 @@ exports.getGameState = function(user, cb) {
   });
 };
 
-// Input: user.uid, user.gameState
-// Writes: user.gameState
-exports.saveGameState = function(user, cb) {
+// Input: user.uid, user.appState
+// Writes: user.appState
+exports.saveAppState = function(user, cb) {
   mongo.Db.connect(process.env.MONGO_URI, function (err, db) {
     if (err) return cb(err);
     db.collection('users').update(
       { _id: user.uid }, 
-      { $set: { gameState: user.gameState } },
+      { $set: { appState: user.appState } },
       { safe: true },
       function(err) {
         if (err) return cb(err);
@@ -107,3 +108,4 @@ exports.saveGameState = function(user, cb) {
     );
   });
 };
+
