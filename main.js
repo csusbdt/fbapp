@@ -1,12 +1,12 @@
-var http        = require('http');
+var http     = require('http');
 
-var req_home    = require('./req_home');
-var req_memfile = require('./req_memfile');
+var req_home = require('./req_home');
+var req_file = require('./req_file');
 
-var router      = require('./router');
+var router   = require('./router');
 
-var model       = require('./model');
-var fb          = require('./fb');
+var model    = require('./model');
+var fb       = require('./fb');
 
 // TODO(turner) minify js and css as part of deployment process
 
@@ -57,7 +57,7 @@ var n = 4;
 function onEnd() {
   if (--n === 0) router.start();
 }
-req_memfile.init(onEnd);
+req_file.init(onEnd);
 req_home.init(onEnd);
 model.init(onEnd);
 fb.init(onEnd);

@@ -4,7 +4,7 @@ var url         = require('url');
 var req_home    = require('./req_home');
 //var req_save    = require('./req_save');
 var req_mem     = require('./req_mem');
-var req_memfile = require('./req_memfile');
+var req_file    = require('./req_file');
 
 function route(req, res) {
   var pathname = url.parse(req.url).pathname;
@@ -12,7 +12,7 @@ function route(req, res) {
   else if (pathname === '/home')         req_home.handle       (req, res);
   else if (pathname === '/save')         req_save.handle       (req, res);
   else if (pathname === '/mem')          req_mem.handle        (req, res);
-  else                                   req_memfile.handle    (req, res);
+  else                                   req_file.handle       (req, res);
 }
 
 function requestHandler(req, res) {

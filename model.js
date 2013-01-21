@@ -2,13 +2,6 @@ var fb          = require('./fb');
 var MongoClient = require('mongodb').MongoClient;
 var Server      = require('mongodb').Server;
 
-//var Db        = require('mongodb').Db;
-//var BSON      = require('mongodb').BSON;
-//var ObjectID  = require('mongodb').ObjectID;
-
-// WARNING: mongo does not use type coercion in many places, 
-//          so use exact types in function arguments.
-
 // A good starting point:
 //     https://github.com/mongodb/node-mongodb-native/blob/master/docs/database.md
 
@@ -34,6 +27,9 @@ var Server      = require('mongodb').Server;
 // err will be undefined or an instance of Error.
 //
 /////////////////////////////////////////////////////////////////////////////////
+
+// WARNING: mongo does not use type coercion in many places, 
+//          so use exact types in function arguments.
 
 var host   = process.env.MONGO_HOST;
 var port   = parseInt(process.env.MONGO_PORT, 10);
