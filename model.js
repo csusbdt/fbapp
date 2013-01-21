@@ -1,5 +1,16 @@
 var mongo = require('mongodb');
-var fb = require('./fb');
+var fb    = require('./fb');
+
+var mongoServer = new mongo.Server(
+  process.env.MONGO_HOST, 
+  parseInt(process.env.MONGO_PORT, 10), 
+  { auto_reconnect: false, poolSize: 50 });
+
+var dbConnector = new mongo.Db(process.env.MONGO_DB, mongoServer, { 
+  retryMiliSeconds: 4000, 
+  numberOfRetries: 6,
+  w: 0 
+});
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -23,23 +34,24 @@ var fb = require('./fb');
 
 // Make sure we can connect to database.
 exports.init = function(cb) {
-  mongo.Db.connect(process.env.MONGO_URI, function (err, db) {
+  dbConnector.open(function(err, db) {
     if (err) throw new Error('failed to connect to database');
     db.close(); 
     cb();
-  });
+  }); 
 };
 
 // Input: user.uid
 // Reads: user.secret, user.expires
 exports.getSecret = function(user, cb) {
-  mongo.Db.connect(process.env.MONGO_URI, function (err, db) {
+  dbConnector.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').findOne(
       { _id: user.uid }, 
       { secret: 1, expires: 1, _id: 0 }, 
       function(err, dbUser) {
-        if (err) return cb(err);
+        db.close();
+        if (err) return cb(err); 
         if (dbUser) {
           user.secret = dbUser.secret;
           user.expires = dbUser.expires;
@@ -56,14 +68,15 @@ exports.getSecret = function(user, cb) {
 // Writes: user.secret, user.expires
 // Note: This function creates user documents when needed.
 exports.saveSecret = function(user, cb) {
-  mongo.Db.connect(process.env.MONGO_URI, function (err, db) {
+  dbConnector.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').update(
       { _id: user.uid }, 
       { $set: { secret: user.secret, expires: user.expires } },
       { safe: true, upsert: true },
       function(err) {
-        if (err) return cb(err);
+        db.close();
+        if (err) return cb(err); 
         cb();
       }
     );
@@ -73,12 +86,13 @@ exports.saveSecret = function(user, cb) {
 // Input: user.uid
 // Reads: user.appState
 exports.getAppState = function(user, cb) {
-  mongo.Db.connect(process.env.MONGO_URI, function (err, db) {
+  dbConnector.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').findOne(
       { _id: user.uid }, 
       { appState: 1, _id: 0 }, 
       function(err, dbUser) {
+        db.close();
         if (err) return cb(err);
         if (dbUser.appState) {
           user.appState = dbUser.appState;
@@ -95,13 +109,14 @@ exports.getAppState = function(user, cb) {
 // Input: user.uid, user.appState
 // Writes: user.appState
 exports.saveAppState = function(user, cb) {
-  mongo.Db.connect(process.env.MONGO_URI, function (err, db) {
+  dbConnector.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').update(
       { _id: user.uid }, 
       { $set: { appState: user.appState } },
       { safe: true },
       function(err) {
+        db.close();
         if (err) return cb(err);
         cb();
       }

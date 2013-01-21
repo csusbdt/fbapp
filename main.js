@@ -36,13 +36,17 @@ var fb          = require('./fb');
 
 if (process.env.FACEBOOK_APP_ID === undefined) throw new Error('FACEBOOK_APP_ID not defined');
 if (process.env.FACEBOOK_SECRET === undefined) throw new Error('FACEBOOK_SECRET not defined');
-if (process.env.MONGO_URI       === undefined) throw new Error('MONGO_URI not defined');
+if (process.env.MONGO_HOST      === undefined) throw new Error('MONGO_HOST not defined');
+if (process.env.MONGO_PORT      === undefined) throw new Error('MONGO_PORT not defined');
+if (process.env.MONGO_DB        === undefined) throw new Error('MONGO_DB not defined');
 if (process.env.PORT            === undefined) throw new Error('PORT not defined');
 
 // Remove spaces that foreman does not take out.
 process.env.FACEBOOK_APP_ID = process.env.FACEBOOK_APP_ID.replace(' ', '');
 process.env.FACEBOOK_SECRET = process.env.FACEBOOK_SECRET.replace(' ', '');
-process.env.MONGO_URI = process.env.MONGO_URI.replace(' ', '');
+process.env.MONGO_HOST = process.env.MONGO_HOST.replace(' ', '');
+process.env.MONGO_PORT = process.env.MONGO_PORT.replace(' ', '');
+process.env.MONGO_DB = process.env.MONGO_DB.replace(' ', '');
 process.env.PORT = process.env.PORT.replace(' ', '');
 
 // Allow node to cache a lot of socket connections to Facebook.
@@ -50,21 +54,9 @@ http.globalAgent.maxSockets = Infinity;
 
 // Run 4 initialization routines in parallel.
 var n = 4;
-/*
-function onEnd(err) {
-  if (err instanceof Error) {
-    console.log(err.message);
-    n = -1;
-  } else {
-    if (--n === 0) router.start();
-  }
-}
-*/
-
 function onEnd() {
   if (--n === 0) router.start();
 }
-
 req_memfile.init(onEnd);
 req_home.init(onEnd);
 model.init(onEnd);
