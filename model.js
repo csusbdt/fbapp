@@ -1,16 +1,19 @@
-var mongo = require('mongodb');
-var fb    = require('./fb');
+var fb          = require('./fb');
+var MongoClient = require('mongodb').MongoClient;
+var Server      = require('mongodb').Server;
 
-var mongoServer = new mongo.Server(
-  process.env.MONGO_HOST, 
-  parseInt(process.env.MONGO_PORT, 10), 
-  { auto_reconnect: false, poolSize: 50 });
+//var Db        = require('mongodb').Db;
+//var BSON      = require('mongodb').BSON;
+//var ObjectID  = require('mongodb').ObjectID;
 
-var dbConnector = new mongo.Db(process.env.MONGO_DB, mongoServer, { 
-  retryMiliSeconds: 4000, 
-  numberOfRetries: 6,
-  w: 0 
-});
+// WARNING: mongo does not use type coercion in many places, 
+//          so use exact types in function arguments.
+
+// A good starting point:
+//     https://github.com/mongodb/node-mongodb-native/blob/master/docs/database.md
+
+// Main doc: 
+//    http://mongodb.github.com/node-mongodb-native/contents.html
 
 /////////////////////////////////////////////////////////////////////////////////
 //
@@ -32,10 +35,29 @@ var dbConnector = new mongo.Db(process.env.MONGO_DB, mongoServer, {
 //
 /////////////////////////////////////////////////////////////////////////////////
 
+var host   = process.env.MONGO_HOST;
+var port   = parseInt(process.env.MONGO_PORT, 10);
+var dbName = process.env.MONGO_DB;
+
+var serverOptions = {
+  auto_reconnect: true, 
+  poolSize: 20
+};
+
+var dbOptions = {
+  retryMiliSeconds: 5000, 
+  numberOfRetries: 4,
+  w: 1
+};
+
+var server = new Server(host, port, serverOptions);
+var client = new MongoClient(server, dbOptions);
+
 // Make sure we can connect to database.
+// Throw any error to halt program.
 exports.init = function(cb) {
-  dbConnector.open(function(err, db) {
-    if (err) throw new Error('failed to connect to database');
+  client.open(function(err, db) {
+    if (err) throw err;
     db.close(); 
     cb();
   }); 
@@ -44,7 +66,7 @@ exports.init = function(cb) {
 // Input: user.uid
 // Reads: user.secret, user.expires
 exports.getSecret = function(user, cb) {
-  dbConnector.open(function(err, db) {
+  client.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').findOne(
       { _id: user.uid }, 
@@ -68,7 +90,7 @@ exports.getSecret = function(user, cb) {
 // Writes: user.secret, user.expires
 // Note: This function creates user documents when needed.
 exports.saveSecret = function(user, cb) {
-  dbConnector.open(function(err, db) {
+  client.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').update(
       { _id: user.uid }, 
@@ -86,7 +108,7 @@ exports.saveSecret = function(user, cb) {
 // Input: user.uid
 // Reads: user.appState
 exports.getAppState = function(user, cb) {
-  dbConnector.open(function(err, db) {
+  client.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').findOne(
       { _id: user.uid }, 
@@ -109,7 +131,7 @@ exports.getAppState = function(user, cb) {
 // Input: user.uid, user.appState
 // Writes: user.appState
 exports.saveAppState = function(user, cb) {
-  dbConnector.open(function(err, db) {
+  client.open(function(err, db) {
     if (err) return cb(err);
     db.collection('users').update(
       { _id: user.uid }, 

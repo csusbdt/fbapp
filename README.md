@@ -12,11 +12,13 @@ Create file .env with the following contents.
  
     FACEBOOK_APP_ID=<facebook-app-id>
     FACEBOOK_SECRET=<facebook-secret>
-    MONGO_URI=mongodb://localhost:27017/fbapp
+    MONGO_HOST=localhost
+    MONGO_PORT=27017
+    MONGO_DB=fbapp
 
-Install mongodb and create a database named _fbapp_.
+Install mongodb and create a database named fbapp.
 
-To run, start mongodb in a terminal window, and in other termial window, 
+To run, start mongod in a terminal window, and in other termial window, 
 run the following.
 
     foreman start
